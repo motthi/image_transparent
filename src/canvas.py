@@ -101,8 +101,11 @@ class ImageCanvas:
         if event.x < 0 or event.x > self.tk_img.width() or event.y < 0 or event.y > self.tk_img.height():
             return
 
-        pix_x = int(event.x / self.scale)
-        pix_y = int(event.y / self.scale)
+        canvas = event.widget
+        x = canvas.canvasx(event.x)
+        y = canvas.canvasy(event.y)
+        pix_x = int(x / self.scale)
+        pix_y = int(y / self.scale)
 
         prev_img = self.img.copy()
         trans_area = self.img[:, :, 3] == 0     # Store transparent area (this area is disappeared at the next line)
