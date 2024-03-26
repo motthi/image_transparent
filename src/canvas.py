@@ -15,7 +15,7 @@ class ImageCanvas:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.img: np.ndarray = None
-        self.tk_img: ImageTk.PhotoImage = None
+        self.img_tk: ImageTk.PhotoImage = None
         self.history = History()
         self.scale = 1.0
 
@@ -42,8 +42,10 @@ class ImageCanvas:
         self.canvas.place(x=0, y=0)
 
         # Background
-        self.bkg_img = ImageTk.PhotoImage(Image.fromarray(cv2.imread("./imgs/background.png")))
-        self.canvas.create_image(0, 0, image=self.bkg_img, anchor="nw")
+        self.bkg_img = cv2.imread("./imgs/background.png")
+        self.bkg_img_tk = ImageTk.PhotoImage(Image.fromarray(self.bkg_img))
+        self.canvas.config(scrollregion=(0, 0, self.bkg_img_tk.width(), self.bkg_img_tk.height()))
+        self.canvas.create_image(0, 0, image=self.bkg_img_tk, anchor="nw", tag="background")
 
         # Keybind
         self.root.drop_target_register(DND_FILES)
@@ -61,8 +63,17 @@ class ImageCanvas:
 
     def depict_img(self):
         self.canvas.delete("image")
-        self.tk_img = ImageTk.PhotoImage(Image.fromarray(cv2.resize(self.img, None, fx=self.scale, fy=self.scale)))
-        self.canvas.create_image(0, 0, image=self.tk_img, anchor="nw")
+        img = cv2.resize(self.img, None, fx=self.scale, fy=self.scale)
+        self.img_tk = ImageTk.PhotoImage(Image.fromarray(img))
+        self.canvas.config(scrollregion=(0, 0, self.img_tk.width(), self.img_tk.height()))
+        if img.shape[0] > self.bkg_img.shape[0] or img.shape[1] > self.bkg_img.shape[1]:
+            self.canvas.delete("background")
+            hnum = int(np.ceil(img.shape[0] / self.bkg_img.shape[0]))
+            wnum = int(np.ceil(img.shape[1] / self.bkg_img.shape[1]))
+            bkg_img = np.tile(self.bkg_img, (hnum, wnum, 1))
+            self.bkg_img_tk = ImageTk.PhotoImage(Image.fromarray(bkg_img))
+            self.canvas.create_image(0, 0, image=self.bkg_img_tk, anchor="nw", tag="background")
+        self.canvas.create_image(0, 0, image=self.img_tk, anchor="nw", tag="image")
 
     def callbackVerticalScroll(self, event):
         if event.delta > 0:
@@ -99,9 +110,9 @@ class ImageCanvas:
         self.depict_img()
 
     def callbackButtonPress(self, event):
-        if self.tk_img is None:
+        if self.img_tk is None:
             return
-        if event.x < 0 or event.x > self.tk_img.width() or event.y < 0 or event.y > self.tk_img.height():
+        if event.x < 0 or event.x > self.img_tk.width() or event.y < 0 or event.y > self.img_tk.height():
             return
 
         canvas = event.widget
