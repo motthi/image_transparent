@@ -55,6 +55,9 @@ class ImageCanvas:
         self.root.bind('<Control-s>', self.callbackSaveImage)
         self.root.bind("<Control-y>", self.callbackRedo)
         self.root.bind("<Control-z>", self.callbackUndo)
+        self.root.bind("<Control-semicolon>", self.callbackEnlarge)
+        self.root.bind("<Control-minus>", self.callbackShrink)
+        self.root.bind("<Control-0>", self.callbackZoomDefault)
 
     def depict_img(self):
         self.canvas.delete("image")
@@ -159,4 +162,30 @@ class ImageCanvas:
         if np.abs(self.scale - 1.0) < 1e-5:
             self.scale = 1.0
 
+        self.depict_img()
+
+    def callbackEnlarge(self, event):
+        if self.img is None:
+            return
+        if self.scale > SCALE_MAX:
+            return
+        self.scale *= 1.25
+        if np.abs(self.scale - 1.0) < 1e-5:
+            self.scale = 1.0
+        self.depict_img()
+
+    def callbackShrink(self, event):
+        if self.img is None:
+            return
+        if self.scale < SCALE_MIN:
+            return
+        self.scale *= 0.8
+        if np.abs(self.scale - 1.0) < 1e-5:
+            self.scale = 1.0
+        self.depict_img()
+
+    def callbackZoomDefault(self, event):
+        if self.img is None:
+            return
+        self.scale = 1.0
         self.depict_img()
