@@ -83,7 +83,7 @@ class ImageCanvas:
         self.scale = 1.0
         self.canvas.delete("image")
         self.canvas.delete("background")
-        self.canvas.config(scrollregion=(0, 0, self.root.winfo_screenwidth() * 2, self.root.winfo_screenheight() * 2))
+        self.canvas.config(scrollregion=(0, 0, self.root.winfo_screenwidth(), self.root.winfo_screenheight()))
         self.canvas.create_image(0, 0, image=self.bkg_img_tk, anchor="nw", tag="background")
 
     def callbackVerticalScroll(self, event):
