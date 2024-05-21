@@ -50,6 +50,7 @@ class ImageCanvas:
         # Keybind
         self.root.drop_target_register(DND_FILES)
         self.root.dnd_bind('<<Drop>>', self.callbackDrop)
+        self.root.bind("<Control-n>", self.callbackReset)
         self.root.bind("<ButtonPress-1>", self.callbackButtonPress)
         self.root.bind("<MouseWheel>", self.callbackVerticalScroll)
         self.root.bind("<Control-MouseWheel>", self.callbackZoom)
@@ -74,6 +75,16 @@ class ImageCanvas:
             self.bkg_img_tk = ImageTk.PhotoImage(Image.fromarray(bkg_img))
             self.canvas.create_image(0, 0, image=self.bkg_img_tk, anchor="nw", tag="background")
         self.canvas.create_image(0, 0, image=self.img_tk, anchor="nw", tag="image")
+
+    def callbackReset(self, event):
+        self.img = None
+        self.img_tk = None
+        self.history = History()
+        self.scale = 1.0
+        self.canvas.delete("image")
+        self.canvas.delete("background")
+        self.canvas.config(scrollregion=(0, 0, self.root.winfo_screenwidth() * 2, self.root.winfo_screenheight() * 2))
+        self.canvas.create_image(0, 0, image=self.bkg_img_tk, anchor="nw", tag="background")
 
     def callbackVerticalScroll(self, event):
         if event.delta > 0:
