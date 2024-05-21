@@ -92,7 +92,8 @@ class ImageCanvas:
         if not filename or len(filename) == 0:
             return
         filebasenm, _ = os.path.splitext(filename)
-        cv2.imwrite(f"{filebasenm}.png", self.img)
+        img = cv2.cvtColor(self.img, cv2.COLOR_RGBA2BGRA)
+        cv2.imwrite(f"{filebasenm}.png", img)
 
     def callbackDrop(self, event):
         files = event.data.split()
@@ -107,6 +108,7 @@ class ImageCanvas:
 
         self.scale = 1.0
         self.img = cv2.imread(files[0], -1)
+        self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGBA)
         self.depict_img()
 
     def callbackButtonPress(self, event):
